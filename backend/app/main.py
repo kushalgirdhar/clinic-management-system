@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from app.core.database import engine, Base
 from sqlalchemy import text
 
+from app.models import user,doctor,patient,appointment
+
 app = FastAPI(
     title="Clinic Management System",
     description="Real-time clinic management API",
@@ -10,7 +12,7 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
-    Base.metadata.create_all(bind=engine)
+    Base.metadata.create_all(bind=engine,checkfirst=True)
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
     print("✅ Database connected successfully!")
