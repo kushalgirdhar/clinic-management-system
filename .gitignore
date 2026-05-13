@@ -11,6 +11,7 @@ __pycache__/
 # Virtual environment
 venv/
 env/
+.env
 
 # Distribution / packaging
 dist/
@@ -27,3 +28,8 @@ node_modules/
 # OS
 .DS_Store
 Thumbs.db
+
+# FastAPI / Python
+*.egg-info/
+dist/
+build/
