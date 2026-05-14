@@ -1,0 +1,27 @@
+from pydantic import BaseModel
+from typing import Optional
+
+class PatientCreate(BaseModel):
+    full_name: str
+    age: int
+    gender: str
+    phone: str
+    address: Optional[str] = None
+
+class PatientUpdate(BaseModel):
+    full_name: Optional[str] = None
+    age: Optional[int] = None
+    gender: Optional[str] = None
+    phone: Optional[str] = None
+    address: Optional[str] = None
+
+class PatientResponse(BaseModel):
+    id: int
+    full_name: str
+    age: int
+    gender: str
+    phone: str
+    address: Optional[str] = None
+
+    class Config:
+        from_attributes = True
