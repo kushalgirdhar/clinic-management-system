@@ -3,8 +3,7 @@ from fastapi.openapi.utils import get_openapi
 from app.core.database import engine, Base
 from sqlalchemy import text
 from app.models import user, doctor, patient, appointment
-from app.api import auth, users, patients,doctors
-
+from app.api import auth, users, patients, doctors, appointments
 app = FastAPI(
     title="Clinic Management System",
     description="Real-time clinic management API",
@@ -15,6 +14,7 @@ app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(patients.router)
 app.include_router(doctors.router)
+app.include_router(appointments.router)
 
 @app.on_event("startup")
 async def startup():
