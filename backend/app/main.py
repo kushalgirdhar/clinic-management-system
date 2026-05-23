@@ -1,13 +1,23 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
 from app.core.database import engine, Base
 from sqlalchemy import text
 from app.models import user, doctor, patient, appointment
 from app.api import auth, users, patients, doctors, appointments
+from app.websockets import queue
+
 app = FastAPI(
     title="Clinic Management System",
     description="Real-time clinic management API",
     version="1.0.0"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(auth.router)
@@ -15,6 +25,7 @@ app.include_router(users.router)
 app.include_router(patients.router)
 app.include_router(doctors.router)
 app.include_router(appointments.router)
+app.include_router(queue.router)
 
 @app.on_event("startup")
 async def startup():

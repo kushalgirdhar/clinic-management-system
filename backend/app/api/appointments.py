@@ -7,11 +7,13 @@ from app.models.appointment import Appointment
 from app.models.patient import Patient
 from app.models.doctor import Doctor
 from app.schemas.appointment import AppointmentCreate, AppointmentStatusUpdate, AppointmentResponse
+from app.websockets.connection_manager import manager
+import json
 
 router = APIRouter(prefix="/appointments", tags=["Appointments"])
 
 @router.post("/", response_model=AppointmentResponse)
-def book_appointment(
+async def book_appointment(
     data: AppointmentCreate,
     db: Session = Depends(get_db),
     current_user=Depends(require_role("admin", "receptionist"))
@@ -34,6 +36,16 @@ def book_appointment(
     db.add(appointment)
     db.commit()
     db.refresh(appointment)
+
+    await manager.broadcast(json.dumps({
+        "event": "new_appointment",
+        "appointment_id": appointment.id,
+        "patient_name": patient.full_name,
+        "doctor_id": appointment.doctor_id,
+        "status": appointment.status,
+        "appointment_time": str(appointment.appointment_time)
+    }))
+
     return appointment
 
 @router.get("/", response_model=List[AppointmentResponse])
@@ -66,7 +78,7 @@ def get_appointment(
     return appointment
 
 @router.put("/{appointment_id}/status", response_model=AppointmentResponse)
-def update_appointment_status(
+async def update_appointment_status(
     appointment_id: int,
     data: AppointmentStatusUpdate,
     db: Session = Depends(get_db),
@@ -81,7 +93,16 @@ def update_appointment_status(
     appointment = db.query(Appointment).filter(Appointment.id == appointment_id).first()
     if not appointment:
         raise HTTPException(status_code=404, detail="Appointment not found")
+
     appointment.status = data.status
     db.commit()
     db.refresh(appointment)
+
+    await manager.broadcast(json.dumps({
+        "event": "status_updated",
+        "appointment_id": appointment.id,
+        "status": appointment.status,
+        "doctor_id": appointment.doctor_id
+    }))
+
     return appointment
