@@ -3,6 +3,8 @@ import { AuthProvider } from './context/AuthContext';
 import PrivateRoute from './components/PrivateRoute';
 import Login from './pages/Login';
 import AdminDashboard from './pages/AdminDashboard';
+import ReceptionistDashboard from './pages/ReceptionistDashboard';
+import DoctorDashboard from './pages/DoctorDashboard';
 
 function App() {
   return (
@@ -14,6 +16,16 @@ function App() {
           <Route path="/admin" element={
             <PrivateRoute roles={['admin']}>
               <AdminDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/receptionist" element={
+            <PrivateRoute roles={['receptionist']}>
+              <ReceptionistDashboard />
+            </PrivateRoute>
+          } />
+          <Route path="/doctor" element={
+            <PrivateRoute roles={['doctor']}>
+              <DoctorDashboard />
             </PrivateRoute>
           } />
         </Routes>
