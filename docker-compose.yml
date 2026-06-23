@@ -1,0 +1,46 @@
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: clinic-mysql
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: Root@@3131
+      MYSQL_DATABASE: clinic_db
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    container_name: clinic-backend
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - .env
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: clinic-frontend
+
+    ports:
+      - "3000:3000"
+
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
